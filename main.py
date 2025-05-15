@@ -23,20 +23,16 @@ def index():
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
-        # Проверка паролей
         if form.password.data != form.password_again.data:
             return render_template('register.html', title='Регистрация', form=form, message="Пароли не совпадают")
 
-        # Инициализация базы данных
         db_session.global_init("mars_explorer.db")
         db_sess = db_session.create_session()
 
-        # Проверка, существует ли пользователь с таким email
         if db_sess.query(User).filter(User.email == form.email.data).first():
             return render_template('register.html', title='Регистрация', form=form,
                                    message="Пользователь с таким email уже существует")
 
-        # Создание нового пользователя
         user = User(
             surname=form.surname.data,
             name=form.name.data,
@@ -46,7 +42,6 @@ def register():
             address=form.address.data,
             email=form.email.data,
             hashed_password=generate_password_hash(form.password.data),
-            about=form.about.data
         )
         db_sess.add(user)
         db_sess.commit()
